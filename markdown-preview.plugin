@@ -1,0 +1,9 @@
+[Plugin]
+Loader=python3
+Module=markdown_preview
+IAge=3
+Name=Markdown Preview
+Description=Toggle between editing and an in-place Markdown preview.
+Icon=text-x-generic
+Authors=Markdown Preview contributors
+Version=1.0
