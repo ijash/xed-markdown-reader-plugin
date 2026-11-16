@@ -16,7 +16,7 @@ case "${1:-}" in
         if [ -d "$module_dir" ]; then
             rm -rf -- "$module_dir"
         fi
-        printf 'Uninstalled Markdown Preview for Xed.\n'
+        printf 'Uninstalled XED Markdow Reader Plugin for Xed.\n'
         exit 0
         ;;
     -h|--help)
@@ -51,4 +51,4 @@ mkdir -p "$module_dir"
 install -m 0644 markdown-preview.plugin "$plugin_dir/markdown-preview.plugin"
 install -m 0644 markdown_preview/*.py "$module_dir/"
 
-printf 'Installed Markdown Preview for Xed. Restart Xed, then enable it in Edit > Preferences > Plugins.\n'
+printf 'Installed XED Markdow Reader Plugin for Xed. Restart Xed, then enable it in Edit > Preferences > Plugins.\n'

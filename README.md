@@ -1,16 +1,21 @@
-# Xed Markdown Preview
+# XED Markdow Reader Plugin
+
+![XED Markdow Reader Plugin logo](assets/img/xed-markdown-reader-plugin-logo-512.png)
 
 A Python plugin for Xed that displays a live, formatted Markdown preview in
-place of the editor. Use the **Markdown Preview** button in the top toolbar,
-**View → Markdown Preview**, or **Ctrl+Shift+M** to switch between editing and
-previewing without splitting the view. Editing is disabled while preview mode
-is active. The mode is tracked per tab, and the preview updates as the document
-changes. Markdown files activate preview automatically when opened; other
-documents stay in the editor until the toggle is used.
+place of the editor. Use the **Preview** button in the top toolbar,
+**View → XED Markdow Reader Plugin**, or **Ctrl+Shift+M** to switch between
+editing and previewing without splitting the view. Editing is disabled while
+preview mode is active. The mode is tracked per tab, and the preview updates as
+the document changes. Markdown files activate preview automatically when
+opened; other documents stay in the editor until the toggle is used.
 
 The renderer supports Markdown headings, emphasis, links, lists, fenced code,
-tables, and block quotes, with styled light and dark themes. Links are displayed
-but not opened, raw HTML is escaped, and external resources are blocked.
+tables, images, and block quotes, with styled light and dark themes. Clicking
+file, HTTP(S), or email links opens them with the desktop's default handler;
+other navigation is blocked. Raw HTML and external image resources are blocked.
+Relative file links and images resolve from the directory containing the
+current Markdown file.
 
 ## Requirements
 
@@ -32,8 +37,8 @@ From this directory, run the installer:
 ./install.sh
 ```
 
-Restart Xed after installation. Enable **Markdown Preview** under **Edit →
-Preferences → Plugins**.
+Restart Xed after installation. Enable **XED Markdow Reader Plugin** under
+**Edit → Preferences → Plugins**.
 
 To remove the plugin and its cached files from the current user's Xed data
 directory, run:

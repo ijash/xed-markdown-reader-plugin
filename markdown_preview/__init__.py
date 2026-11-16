@@ -1,4 +1,7 @@
 from gettext import gettext as _
+import logging
+from urllib.parse import urljoin, urlsplit
+
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -17,6 +20,7 @@ MENU_PATH = "/MenuBar/ViewMenu/ViewOps_1"
 PLUGIN_NAME = "MarkdownPreviewPlugin"
 DEBOUNCE_MS = 150
 MARKDOWN_EXTENSIONS = (".md", ".markdown", ".mdown", ".mkd", ".mkdn", ".mdwn")
+_LOGGER = logging.getLogger(__name__)
 
 
 class MarkdownPreviewPlugin(GObject.Object, Xed.WindowActivatable):
@@ -132,7 +136,7 @@ class MarkdownPreviewPlugin(GObject.Object, Xed.WindowActivatable):
         self._action_group = Gtk.ActionGroup(name="XedMarkdownPreviewActions")
         self._toggle_action = Gtk.ToggleAction(
             name="MarkdownPreviewAction",
-            label=_("Markdown Preview"),
+            label=_("XED Markdow Reader Plugin"),
             tooltip=_("Toggle between the editor and Markdown preview"),
             stock_id=None,
         )
@@ -334,7 +338,7 @@ class MarkdownPreviewPlugin(GObject.Object, Xed.WindowActivatable):
     def _get_base_uri(uri):
         if not uri or not uri.startswith("file://"):
             return None
-        return uri.rsplit("/", 1)[0] + "/"
+        return urljoin(uri, ".")
 
     def _on_decide_policy(self, web_view, decision, decision_type):
         state = next(
@@ -353,11 +357,35 @@ class MarkdownPreviewPlugin(GObject.Object, Xed.WindowActivatable):
             WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION,
         )
         if decision_type in navigation_types:
-            request = decision.get_navigation_action().get_request()
+            navigation_action = decision.get_navigation_action()
+            request = navigation_action.get_request()
             uri = request.get_uri()
+            try:
+                scheme = urlsplit(uri).scheme.lower()
+            except ValueError as error:
+                _LOGGER.warning("Could not parse Markdown link: %s", error)
+                scheme = None
             if uri == state["expected_navigation_uri"]:
                 state["expected_navigation_uri"] = None
                 decision.use()
+            elif (
+                navigation_action.is_user_gesture()
+                and scheme in ("file", "http", "https", "mailto")
+            ):
+                decision.ignore()
+                try:
+                    opened = Gtk.show_uri_on_window(
+                        self.window, uri, Gtk.get_current_event_time()
+                    )
+                except GLib.Error as error:
+                    _LOGGER.warning(
+                        "Could not open Markdown link: %s", error.message
+                    )
+                else:
+                    if not opened:
+                        _LOGGER.warning(
+                            "Could not open Markdown link: no desktop handler opened it"
+                        )
             else:
                 decision.ignore()
             return True
