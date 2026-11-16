@@ -233,7 +233,7 @@ class MarkdownRendererTests(unittest.TestCase):
         self.assertTrue(non_user_navigation.ignored)
         show_uri.assert_not_called()
 
-    def test_preview_mode_disables_editing_and_restores_it(self):
+    def test_preview_mode_keeps_hidden_editor_editability_unchanged(self):
         class FakeAction:
             def __init__(self, active):
                 self.active = active
@@ -249,16 +249,10 @@ class MarkdownRendererTests(unittest.TestCase):
                 self.visible_child = name
 
         class FakeView:
-            def __init__(self):
-                self.editable = True
+            def __init__(self, editable=True):
+                self.editable = editable
                 self.cursor_visible = True
                 self.focused = False
-
-            def set_editable(self, editable):
-                self.editable = editable
-
-            def set_cursor_visible(self, visible):
-                self.cursor_visible = visible
 
             def grab_focus(self):
                 self.focused = True
@@ -272,8 +266,6 @@ class MarkdownRendererTests(unittest.TestCase):
         state = {
             "stack": FakeStack(),
             "view": view,
-            "editor_editable": True,
-            "editor_cursor_visible": True,
             "web_view": FakeWebView(),
             "preview": False,
         }
@@ -289,8 +281,8 @@ class MarkdownRendererTests(unittest.TestCase):
         )
 
         MarkdownPreviewPlugin._on_toggle(plugin, FakeAction(True))
-        self.assertFalse(view.editable)
-        self.assertFalse(view.cursor_visible)
+        self.assertTrue(view.editable)
+        self.assertTrue(view.cursor_visible)
         self.assertEqual(state["stack"].visible_child, "preview")
         self.assertTrue(state["preview"])
 
@@ -299,6 +291,11 @@ class MarkdownRendererTests(unittest.TestCase):
         self.assertTrue(view.cursor_visible)
         self.assertEqual(state["stack"].visible_child, "editor")
         self.assertFalse(state["preview"])
+
+        view.editable = False
+        MarkdownPreviewPlugin._on_toggle(plugin, FakeAction(True))
+        MarkdownPreviewPlugin._on_toggle(plugin, FakeAction(False))
+        self.assertFalse(view.editable)
 
     def test_markdown_documents_are_detected_by_extension(self):
         class FakeLocation:
@@ -348,12 +345,6 @@ class MarkdownRendererTests(unittest.TestCase):
                 self.editable = True
                 self.cursor_visible = True
 
-            def set_editable(self, editable):
-                self.editable = editable
-
-            def set_cursor_visible(self, visible):
-                self.cursor_visible = visible
-
             def grab_focus(self):
                 pass
 
@@ -365,8 +356,6 @@ class MarkdownRendererTests(unittest.TestCase):
         state = {
             "stack": FakeStack(),
             "view": FakeView(),
-            "editor_editable": True,
-            "editor_cursor_visible": True,
             "web_view": FakeWebView(),
             "preview": False,
         }
@@ -380,7 +369,7 @@ class MarkdownRendererTests(unittest.TestCase):
         MarkdownPreviewPlugin._set_preview_state(plugin, tab, True)
         self.assertTrue(state["preview"])
         self.assertEqual(state["stack"].visible_child, "preview")
-        self.assertFalse(state["view"].editable)
+        self.assertTrue(state["view"].editable)
 
 
 if __name__ == "__main__":

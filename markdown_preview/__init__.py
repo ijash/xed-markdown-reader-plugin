@@ -112,8 +112,6 @@ class MarkdownPreviewPlugin(GObject.Object, Xed.WindowActivatable):
             "stack": stack,
             "editor_root": editor_root,
             "view": view,
-            "editor_editable": view.get_editable(),
-            "editor_cursor_visible": view.get_cursor_visible(),
             "web_view": None,
             "dark_theme": dark_theme,
             "preview": False,
@@ -127,8 +125,6 @@ class MarkdownPreviewPlugin(GObject.Object, Xed.WindowActivatable):
         state["stack"].remove(state["editor_root"])
         tab.remove(state["stack"])
         tab.pack_start(state["editor_root"], True, True, 0)
-        state["view"].set_editable(state["editor_editable"])
-        state["view"].set_cursor_visible(state["editor_cursor_visible"])
         state["editor_root"].show_all()
 
     def _insert_menu(self):
@@ -252,13 +248,9 @@ class MarkdownPreviewPlugin(GObject.Object, Xed.WindowActivatable):
             "preview" if active else "editor"
         )
         if active:
-            state["view"].set_editable(False)
-            state["view"].set_cursor_visible(False)
             state["web_view"].grab_focus()
             self._queue_update(tab)
         else:
-            state["view"].set_editable(state["editor_editable"])
-            state["view"].set_cursor_visible(state["editor_cursor_visible"])
             state["view"].grab_focus()
         self._sync_toggle_action()
 
